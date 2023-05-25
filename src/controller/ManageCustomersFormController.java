@@ -2,6 +2,7 @@ package controller;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
+import dao.CrudDAO;
 import dao.CustomerDAO;
 import dao.CustomerDAOImpl;
 import javafx.application.Platform;
@@ -41,7 +42,7 @@ public class ManageCustomersFormController {
     public TableView<CustomerTM> tblCustomers;
     public JFXButton btnAddNewCustomer;
 
-    public CustomerDAO customerDAO = new CustomerDAOImpl();
+    public CrudDAO<CustomerDTO, String> customerDAO = new CustomerDAOImpl();
 
     public void initialize() {
         tblCustomers.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -74,7 +75,7 @@ public class ManageCustomersFormController {
         tblCustomers.getItems().clear();
         try {
             /*Get all customers*/
-            ArrayList<CustomerDTO> allCustomers = customerDAO.getAllCustomers();
+            ArrayList<CustomerDTO> allCustomers = customerDAO.getAll();
             for (CustomerDTO c : allCustomers) {
                 tblCustomers.getItems().add(new CustomerTM(c.getId(), c.getName(), c.getAddress()));
             }
@@ -146,7 +147,7 @@ public class ManageCustomersFormController {
                 }
 
                 //Add Customer
-                customerDAO.addCustomer(new CustomerDTO(id,name,address));
+                customerDAO.add(new CustomerDTO(id,name,address));
 
 
                 tblCustomers.getItems().add(new CustomerTM(id, name, address));
@@ -165,7 +166,7 @@ public class ManageCustomersFormController {
                 }
 
                 //Update Customer
-                customerDAO.updateCustomer(new CustomerDTO(id,name,address));
+                customerDAO.update(new CustomerDTO(id,name,address));
 
             } catch (SQLException e) {
                 new Alert(Alert.AlertType.ERROR, "Failed to update the customer " + id + e.getMessage()).show();
@@ -184,7 +185,7 @@ public class ManageCustomersFormController {
 
 
     boolean existCustomer(String id) throws SQLException, ClassNotFoundException {
-       return customerDAO.existCustomer(id);
+       return customerDAO.exist(id);
     }
 
 
@@ -197,7 +198,7 @@ public class ManageCustomersFormController {
             }
 
             //Delete Customer
-            customerDAO.deleteCustomer(id);
+            customerDAO.delete(id);
 
             tblCustomers.getItems().remove(tblCustomers.getSelectionModel().getSelectedItem());
             tblCustomers.getSelectionModel().clearSelection();
